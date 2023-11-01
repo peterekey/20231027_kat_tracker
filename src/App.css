@@ -1,0 +1,24 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  width: 100%;
+}
+
+#searchbox {
+  top: 10px;
+  left: 0px;
+  height: 55px;
+  width: 100%;
+  border-bottom: 5px solid grey;
+  display: flex;
+  justify-content: center;
+}
