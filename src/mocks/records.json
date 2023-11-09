@@ -1,0 +1,74 @@
+[
+    {
+        "datetime": 1698959750620,
+        "exercise": "chest press",
+        "equipment": "v bar",
+        "reps": 8,
+        "special": "",
+        "weight": 20,
+        "difficulty": ""
+    },
+    {
+        "datetime": 1699078963698,
+        "exercise": "chest press",
+        "equipment": "v bar",
+        "reps": 8,
+        "special": "",
+        "weight": 22,
+        "difficulty": ""
+    },
+    {
+        "datetime": 1699079000353,
+        "exercise": "chest press",
+        "equipment": "v bar",
+        "reps": 8,
+        "special": "",
+        "weight": 15,
+        "difficulty": ""
+    },
+    {
+        "datetime": 1699079040670,
+        "exercise": "chest press",
+        "equipment": "v bar",
+        "reps": 10,
+        "special": "",
+        "weight": 12,
+        "difficulty": ""
+    },
+    {
+        "datetime": 1699079963208,
+        "exercise": "chest press",
+        "equipment": "v bar",
+        "reps": 18,
+        "special": "4+4",
+        "weight": 14,
+        "difficulty": ""
+    },
+    {
+        "datetime": 1699079969328,
+        "exercise": "chest press",
+        "equipment": "v bar",
+        "reps": 18,
+        "special": "4+4",
+        "weight": 14,
+        "difficulty": ""
+    },
+    {
+        "datetime": 1699080080350,
+        "exercise": "SA chest press",
+        "equipment": "v handles",
+        "reps": 8,
+        "special": "",
+        "weight": 15,
+        "difficulty": ""
+    },
+    {
+        "datetime": 1699080087251,
+        "exercise": "pendelay row",
+        "equipment": "v bar",
+        "reps": 6,
+        "special": "",
+        "weight": 6,
+        "difficulty": ""
+    }
+]

@@ -1,5 +1,5 @@
-import SearchBox from './components/SearchBox'
-import Table from './components/Table'
+import SearchBox from '../components/SearchBox'
+import Table from '../components/Table'
 import './App.css'
 
 function App() {
