@@ -2,6 +2,7 @@ import './Table.css'
 import Records from '../features/record/Records'
 
 export default function Table() {
+
     return (
         <table>
             <thead>

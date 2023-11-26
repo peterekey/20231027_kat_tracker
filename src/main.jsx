@@ -4,8 +4,7 @@ import App from './app/App.jsx'
 import './index.css'
 import { Provider } from 'react-redux'
 import store from './app/store'
-const { worker } = await import('./mocks/browser');
-worker.start()
+import './mocks' 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
