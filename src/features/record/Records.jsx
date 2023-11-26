@@ -17,9 +17,7 @@ const Records = () => {
 
     useEffect(() => {
         dispatch(loadAllRecords())
-    }, [dispatch])
-
-    console.log(records)
+    }, [])
 
     if (records.length === 0 && !isLoadingRecords && !hasErrorRecords) {
         return <tr><td>no data...</td></tr>

@@ -2,10 +2,18 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 export const loadAllRecords = createAsyncThunk(
     'records/loadAllRecords',
-    async () => {
-        const data = await fetch('/api/records')
-        const json = await data.json()
-        return json
+    async (_, { rejectWithValue } ) => {
+        try {
+            const data = await fetch(import.meta.env.VITE_API_URL + '/api/records')
+            const json = await data.json()
+            return json
+        } catch (error) {
+            console.log('error: ', error)
+            console.log('data:', error.response.data)
+            console.log('message:', error.response.data.message)
+            return rejectWithValue(error.response.data.message)
+        }
+
     }
 )
 export const recordsSlice = createSlice({
@@ -13,7 +21,7 @@ export const recordsSlice = createSlice({
     initialState: {
         records: [],
         isLoadingRecords: false,
-        hasError: false
+        hasError: false,
     },
     extraReducers: (builder) => {
         builder
@@ -31,7 +39,6 @@ export const recordsSlice = createSlice({
             state.records = []
         })
     }})
-
 
 export const selectAllRecords = (state) => state.records
 export const isLoading = (state) => state.records.isLoadingRecords
