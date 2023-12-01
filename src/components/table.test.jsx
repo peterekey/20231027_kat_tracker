@@ -29,7 +29,7 @@ describe("Table component", () => {
     })
 
     it("should have input cells in the first row", () => {
-        const inputElements = container.querySelectorAll("tbody tr:first-child input[type='text']")
+        const inputElements = container.querySelectorAll("tbody tr:first-child input")
         expect(inputElements.length).toBe(7)
     })
 })

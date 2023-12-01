@@ -1,24 +1,6 @@
-import { useDispatch, useSelector } from 'react-redux'
-import {
-    loadAllRecords,
-    selectAllRecords,
-    isLoading,
-    hasError
-} from './recordsSlice'
-import { useEffect } from 'react'
+import PropTypes from 'prop-types'
 
-const Records = () => {
-    const dispatch = useDispatch()
-    const recordsObject = useSelector(selectAllRecords)
-    const records = recordsObject.records
-
-    const isLoadingRecords = useSelector(isLoading)
-    const hasErrorRecords = useSelector(hasError)
-
-    useEffect(() => {
-        dispatch(loadAllRecords())
-    }, [])
-
+const Records = ({records, isLoadingRecords, hasErrorRecords}) => {
     if (records.length === 0 && !isLoadingRecords && !hasErrorRecords) {
         return <tr><td>no data...</td></tr>
     }
@@ -49,3 +31,9 @@ const Records = () => {
 }
 
 export default Records
+
+Records.propTypes = {
+    records: PropTypes.array,
+    isLoadingRecords: PropTypes.bool,
+    hasErrorRecords: PropTypes.bool
+}
