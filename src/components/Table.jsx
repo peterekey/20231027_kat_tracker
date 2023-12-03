@@ -54,7 +54,7 @@ export default function Table() {
                     <th><label htmlFor="exercise">Exercise</label></th>
                     <th><label htmlFor="equipment">Equipment</label></th>
                     <th><label htmlFor="reps">Reps</label></th>
-                    <th><label htmlFor="tempo">Tempo or special</label></th>
+                    <th><label htmlFor="special">Tempo or special</label></th>
                     <th><label htmlFor="weight">Weight</label></th>
                     <th><label htmlFor="difficulty">Difficulty</label></th>
                     <th><label htmlFor="datetime">Date & time</label></th>
@@ -62,13 +62,21 @@ export default function Table() {
             </thead>
             <tbody>
                 <tr>
-                    <td><input type="text" id="exercise" name="exercise" onChange={handleTextChange}></input></td>
-                    <td><input type="text" id="equipment" name="equipment" onChange={handleTextChange}></input></td>
-                    <td><input type="number" id="reps" name="reps" onChange={handleTextChange}></input></td>
-                    <td><input type="text" id="special" name="special" onChange={handleTextChange}></input></td>
-                    <td><input type="number" id="weight" name="weight" onChange={handleTextChange}></input></td>
-                    <td><input type="text" id="difficulty" name="difficulty" onChange={handleTextChange}></input></td>
-                    <td><input type="date" id="datetime" name="datetime" onChange={handleTextChange}></input></td>
+                    <td><input type="text" id="exercise" name="exercise" onChange={handleTextChange} /></td>
+                    <td><input type="text" id="equipment" name="equipment" onChange={handleTextChange} /></td>
+                    <td><input type="number" id="reps" name="reps" onChange={handleTextChange} /></td>
+                    <td><input type="text" id="special" name="special" onChange={handleTextChange} /></td>
+                    <td><input type="number" id="weight" name="weight" onChange={handleTextChange} /></td>
+                    <td>
+                        <input type="text" id="difficulty" name="difficulty" list="difficultynames" onChange={handleTextChange} />
+                            <datalist id="difficultynames">
+                                <option value="Easy"></option>
+                                <option value="Manageable"></option>
+                                <option value="Hard"></option>
+                                <option value="Couldn't complete"></option>
+                            </datalist>
+                    </td>
+                    <td><input type="date" id="datetime" name="datetime" onChange={handleTextChange} /></td>
                 </tr>
             <Records 
                 records={records}

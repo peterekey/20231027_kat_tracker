@@ -9,7 +9,7 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest --coverage",
-    "test:ui": "vitest --ui --api 1337"
+    "test:ui": "vitest --coverage --ui --api 1337"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.7",
