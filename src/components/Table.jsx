@@ -11,42 +11,101 @@ import { useEffect, useState } from 'react'
 
 export default function Table() {
 
+    // console.log('Starting at the top!')
     const [records, setRecords] = useState([])
+    const [filters, setFilters] = useState({})
     
     const dispatch = useDispatch()
-
+    
     const recordsObject = useSelector(selectAllRecords)
 
+    // console.log(recordsObject.records)
+    
     useEffect(() => {
         dispatch(loadAllRecords())
         setRecords(recordsObject.records)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch])
+    }, [])
     
+    // console.log('records is ', records)
+    // console.log('filters is: ', filters)
+
     const isLoadingRecords = useSelector(isLoading)
     const hasErrorRecords = useSelector(hasError)
 
-    const recordsToShow = (userInput, columnName) => {
-        const result = recordsObject.records.filter((record) => {
-            if (isNaN(record[columnName])) {
-                return record[columnName].includes(userInput)
-            } else {
-                const set = [record[columnName]]
-                return set.includes(+userInput)
+    const recordsToShowII = (columnFilters) => {
+        // console.log('starting recordsToShowII...')
+        if (columnFilters == null) {
+            // console.log('columnFilters is empty')
+            return
+        }
+
+        // console.log('columnFilters is not empty! continuing...')
+        // console.log('columnFilters is ', JSON.stringify(columnFilters))
+        const filtersArr = Object.entries(columnFilters)
+        // console.log('filtersArr is ', filtersArr)
+
+        const filteredItems = recordsObject.records.filter(object => {
+            // console.log('object is ', object)
+            const result = filtersArr.every(([key, values]) => {
+                // console.log('object[key] is ', object[key])
+                // console.log('key is: ', key)
+                // console.log('values is: ', values)
+                // console.log('object[key].includes(values) is ', object[key].includes(values))
+                if(isNaN(object[key])) {
+                    // console.log('in the NaN')
+                    // console.log('returning ', object[key].includes(values))
+                    return object[key].includes(values)
+                } else {
+                    // console.log('is a number')
+                    // console.log('returning ', [object[key]].includes(+values))
+                    return [object[key]].includes(+values)
+                } 
+            })
+            // console.log('result is: ', result)
+            if (result) {
+                // console.log('returning ', object)
+                return object
             }
         })
-        return result
+
+        // console.log('returning ', filteredItems)
+        return filteredItems
     }
 
-    const handleTextChange = ({target}) => {
-        if (target.value === '') {
-            setRecords(recordsObject.records)
-        } else {
-            const newRecords = recordsToShow(target.value, target.id)
-            setRecords(newRecords)
+    const handleTextChange = (event) => {
+        // console.log('event is ', event)
+        const { value, id } = event.target
+        // console.log(`value is ${value} and id is ${id}`)
+        if (value === '') {
+            // console.log('empty value')
+            setFilters((prev) => {
+                const filteredObject = {}
+                for (const key in prev) {
+                    if (key !== id) {
+                        filteredObject[key] = prev[key]
+                    }
+                }
+                // console.log('filteredObject is ', filteredObject)
+                return filteredObject
+            })
         }
-    }
 
+        else {
+            setFilters((prev) => ({
+                ...prev,
+                [id]: value
+            }))
+        }
+
+    }
+    
+    useEffect(() => {
+        // console.log('after a filter change, the filters are now:')
+        // console.log(filters)
+        setRecords(recordsToShowII(filters))
+    }, [filters])
+
+    
     return (
         <table>
             <thead>

@@ -6,6 +6,7 @@ export const loadAllRecords = createAsyncThunk(
         try {
             const data = await fetch(import.meta.env.VITE_API_URL + '/api/records')
             const json = await data.json()
+            // console.log(JSON.stringify(json))
             return json
         } catch (error) {
             console.log('error: ', error)
