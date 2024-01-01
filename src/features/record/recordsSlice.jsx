@@ -17,6 +17,34 @@ export const loadAllRecords = createAsyncThunk(
 
     }
 )
+
+export const addNewRecord = createAsyncThunk(
+    'records/addRecord',
+    async (newRecord, {rejectWithValue}) => {
+        try {
+            console.log('trying to add new record ', newRecord)
+            const response = await fetch(
+                import.meta.env.VITE_API_URL + '/api/records',
+                {
+                    method: 'POST',
+                    body: JSON.stringify(newRecord),
+                    headers: {
+                        'Content-type': 'application/json'
+                    }
+                }
+            )
+
+            const json = await response.json()
+            console.log('json is ', json)
+            return json
+        } catch (error) {
+            console.log('error: ', error)
+            return rejectWithValue(error.response.data.message)
+        }
+
+    }
+)
+
 export const recordsSlice = createSlice({
     name: "records",
     initialState: {
@@ -38,6 +66,13 @@ export const recordsSlice = createSlice({
             state.isLoadingRecords = false
             state.hasError = true
             state.records = []
+        })
+        .addCase(addNewRecord.fulfilled, (state, action) => {
+            state.isLoadingRecords = false
+            state.records = action.payload
+        })
+        .addCase(addNewRecord.rejected, (_, action) => {
+            console.log('An error occurred: ', action.payload)
         })
     }})
 
