@@ -1,3 +1,14 @@
 table, tr, td {
     border: 1px solid coral;
 }
+
+td#addLogo {
+    vertical-align: middle;
+    visibility: hidden;
+}
+
+img#addLogoImage {
+    max-height: 20px;
+    max-width: 20px;
+    display: block;
+}
