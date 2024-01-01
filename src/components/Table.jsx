@@ -8,10 +8,9 @@ import {
     hasError
 } from '../features/record/recordsSlice'
 import { useEffect, useState } from 'react'
+import addLogo from '../assets/add.png'
 
 export default function Table() {
-
-    // console.log('Starting at the top!')
     const [records, setRecords] = useState([])
     const [filters, setFilters] = useState({})
     
@@ -19,65 +18,41 @@ export default function Table() {
     
     const recordsObject = useSelector(selectAllRecords)
 
-    // console.log(recordsObject.records)
-    
     useEffect(() => {
         dispatch(loadAllRecords())
         setRecords(recordsObject.records)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-    
-    // console.log('records is ', records)
-    // console.log('filters is: ', filters)
 
     const isLoadingRecords = useSelector(isLoading)
     const hasErrorRecords = useSelector(hasError)
 
     const recordsToShowII = (columnFilters) => {
-        // console.log('starting recordsToShowII...')
         if (columnFilters == null) {
-            // console.log('columnFilters is empty')
             return
         }
 
-        // console.log('columnFilters is not empty! continuing...')
-        // console.log('columnFilters is ', JSON.stringify(columnFilters))
         const filtersArr = Object.entries(columnFilters)
-        // console.log('filtersArr is ', filtersArr)
 
         const filteredItems = recordsObject.records.filter(object => {
-            // console.log('object is ', object)
             const result = filtersArr.every(([key, values]) => {
-                // console.log('object[key] is ', object[key])
-                // console.log('key is: ', key)
-                // console.log('values is: ', values)
-                // console.log('object[key].includes(values) is ', object[key].includes(values))
                 if(isNaN(object[key])) {
-                    // console.log('in the NaN')
-                    // console.log('returning ', object[key].includes(values))
                     return object[key].includes(values)
                 } else {
-                    // console.log('is a number')
-                    // console.log('returning ', [object[key]].includes(+values))
                     return [object[key]].includes(+values)
                 } 
             })
-            // console.log('result is: ', result)
             if (result) {
-                // console.log('returning ', object)
                 return object
             }
         })
 
-        // console.log('returning ', filteredItems)
         return filteredItems
     }
 
     const handleTextChange = (event) => {
-        // console.log('event is ', event)
         const { value, id } = event.target
-        // console.log(`value is ${value} and id is ${id}`)
         if (value === '') {
-            // console.log('empty value')
             setFilters((prev) => {
                 const filteredObject = {}
                 for (const key in prev) {
@@ -85,7 +60,6 @@ export default function Table() {
                         filteredObject[key] = prev[key]
                     }
                 }
-                // console.log('filteredObject is ', filteredObject)
                 return filteredObject
             })
         }
@@ -100,11 +74,54 @@ export default function Table() {
     }
     
     useEffect(() => {
-        // console.log('after a filter change, the filters are now:')
-        // console.log(filters)
         setRecords(recordsToShowII(filters))
+        const logo = document.getElementById("addLogoImage")
+        if (Object.keys(filters).length > 0) {
+            logo.style.visibility = 'visible'
+        } else {
+            logo.style.visibility = 'hidden'
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filters])
 
+    const inputs = [
+        {
+            type: "text",
+            id: "exercise",
+            name: "exercise", 
+        },
+        {
+            type: "text",
+            id: "equipment", 
+            name: "equipment"
+        },
+        {
+            type: "number",
+            id: "reps", 
+            name: "reps"
+        },
+        {
+            type: "text",
+            id: "special", 
+            name: "special"
+        },
+        {
+            type: "number",
+            id: "weight", 
+            name: "weight"
+        },
+        {
+            type: "text",
+            id: "difficulty",
+            name: "difficulty",
+            list: "difficultynames",
+            options: ["easy", "manageable", "hard", "couldn't complete"] 
+        },
+        {
+            type: "date",
+            id: "datetime", 
+        },
+    ]
     
     return (
         <table>
@@ -117,25 +134,37 @@ export default function Table() {
                     <th><label htmlFor="weight">Weight</label></th>
                     <th><label htmlFor="difficulty">Difficulty</label></th>
                     <th><label htmlFor="datetime">Date & time</label></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><input type="text" id="exercise" name="exercise" onChange={handleTextChange} /></td>
-                    <td><input type="text" id="equipment" name="equipment" onChange={handleTextChange} /></td>
-                    <td><input type="number" id="reps" name="reps" onChange={handleTextChange} /></td>
-                    <td><input type="text" id="special" name="special" onChange={handleTextChange} /></td>
-                    <td><input type="number" id="weight" name="weight" onChange={handleTextChange} /></td>
-                    <td>
-                        <input type="text" id="difficulty" name="difficulty" list="difficultynames" onChange={handleTextChange} />
-                            <datalist id="difficultynames">
-                                <option value="Easy"></option>
-                                <option value="Manageable"></option>
-                                <option value="Hard"></option>
-                                <option value="Couldn't complete"></option>
-                            </datalist>
+                    {inputs.map((input) => {
+                            // eslint-disable-next-line no-unused-vars
+                            const {options, title: _, ...rest} = input
+                            return (
+                                <td key={input.id} >
+                                    <input {...rest} onChange={handleTextChange}/>
+                                    { !("list" in input) ? null : (
+                                            <datalist id={input.list}>
+                                                {options.map((optionValue) => {
+                                                    return (<option key={optionValue} value={optionValue}></option>)
+                                                })}
+                                            </datalist>
+                                        )
+                                    }
+                                </td>
+                            )
+                        }
+                    )}
+                    <td id="addLogo">
+                        <img 
+                            src={addLogo} 
+                            id="addLogoImage" 
+                            alt="Add as new record"
+                            aria-label="Add as new record"
+                        />
                     </td>
-                    <td><input type="date" id="datetime" name="datetime" onChange={handleTextChange} /></td>
                 </tr>
             <Records 
                 records={records}
