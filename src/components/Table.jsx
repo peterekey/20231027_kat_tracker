@@ -5,48 +5,57 @@ import {
     loadAllRecords,
     selectAllRecords,
     isLoading,
-    hasError
+    hasError,
+    addNewRecord
 } from '../features/record/recordsSlice'
 import { useEffect, useState } from 'react'
 import addLogo from '../assets/add.png'
 
 export default function Table() {
-    const [records, setRecords] = useState([])
+    const [visibleRecords, setVisibleRecords] = useState([])
     const [filters, setFilters] = useState({})
     
     const dispatch = useDispatch()
     
-    const recordsObject = useSelector(selectAllRecords)
+    const allRecords = useSelector(selectAllRecords)
 
     useEffect(() => {
         dispatch(loadAllRecords())
-        setRecords(recordsObject.records)
+        setVisibleRecords(allRecords.records)
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    // useEffect(() => {
+    //     setVisibleRecords(allRecords.records)
+    //     // setVisibleRecords(recordsToShowII(filters))
+    // }, [allRecords])
 
     const isLoadingRecords = useSelector(isLoading)
     const hasErrorRecords = useSelector(hasError)
 
     const recordsToShowII = (columnFilters) => {
-        if (columnFilters == null) {
-            return
-        }
-
         const filtersArr = Object.entries(columnFilters)
-
-        const filteredItems = recordsObject.records.filter(object => {
+        // console.log('allRecords.records is ', allRecords.records)
+        const filteredItems = allRecords.records.filter(object => {
+            // console.log('in filteredItems, object is ', object)
             const result = filtersArr.every(([key, values]) => {
+                // console.log('current key is ', key)
+                // console.log('current values is ', values)
                 if(isNaN(object[key])) {
+                    // console.log(`In the isNaN for ${object[key]}`)
                     return object[key].includes(values)
                 } else {
+                    // console.log(`Not in the isNaN for ${object[key]}`)
                     return [object[key]].includes(+values)
                 } 
             })
             if (result) {
+                // console.log(result)
+                // console.log(object)
                 return object
             }
         })
-
+        // console.log('filteredItems is ', filteredItems)
         return filteredItems
     }
 
@@ -72,9 +81,28 @@ export default function Table() {
         }
 
     }
+
+    const handleAddRecord = () => {
+        const input = {}
+        input.datetime =  document.getElementById('datetime').value || Date.now()
+        const keys = ['exercise', 'equipment', 'reps', 'special', 'weight', 'difficulty']
+        for (const key of keys) {
+            switch (true) {
+                case (key === 'reps' || key === 'weight'):
+                    input[key] = Number(document.getElementById(key).value) || 0
+                    break
+                case (key === 'exercise' || key === 'equipment' || key === 'special' || key === 'difficulty'):
+                    input[key] = document.getElementById(key).value || ''
+                    break
+            }
+            
+        }
+        dispatch(addNewRecord(input))
+    }
     
     useEffect(() => {
-        setRecords(recordsToShowII(filters))
+        // console.log('running setVisibleREcords')
+        setVisibleRecords(recordsToShowII(filters))
         const logo = document.getElementById("addLogoImage")
         if (Object.keys(filters).length > 0) {
             logo.style.visibility = 'visible'
@@ -82,7 +110,7 @@ export default function Table() {
             logo.style.visibility = 'hidden'
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filters])
+    }, [filters, allRecords])
 
     const inputs = [
         {
@@ -118,7 +146,7 @@ export default function Table() {
             options: ["easy", "manageable", "hard", "couldn't complete"] 
         },
         {
-            type: "date",
+            type: "datetime-local",
             id: "datetime", 
         },
     ]
@@ -163,11 +191,12 @@ export default function Table() {
                             id="addLogoImage" 
                             alt="Add as new record"
                             aria-label="Add as new record"
+                            onClick={handleAddRecord}
                         />
                     </td>
                 </tr>
             <Records 
-                records={records}
+                records={visibleRecords}
                 isLoadingRecords={isLoadingRecords}
                 hasErrorRecords={hasErrorRecords}
             />
