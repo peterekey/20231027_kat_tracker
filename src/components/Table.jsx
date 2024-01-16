@@ -35,19 +35,27 @@ export default function Table() {
 
     const recordsToShowII = (columnFilters) => {
         const filtersArr = Object.entries(columnFilters)
+        // console.log('allRecords.records is ', allRecords.records)
         const filteredItems = allRecords.records.filter(object => {
+            // console.log('in filteredItems, object is ', object)
             const result = filtersArr.every(([key, values]) => {
+                // console.log('current key is ', key)
+                // console.log('current values is ', values)
                 if(isNaN(object[key])) {
+                    // console.log(`In the isNaN for ${object[key]}`)
                     return object[key].includes(values)
                 } else {
+                    // console.log(`Not in the isNaN for ${object[key]}`)
                     return [object[key]].includes(+values)
                 } 
             })
             if (result) {
+                // console.log(result)
+                // console.log(object)
                 return object
             }
         })
-
+        // console.log('filteredItems is ', filteredItems)
         return filteredItems
     }
 
@@ -79,14 +87,21 @@ export default function Table() {
         input.datetime =  document.getElementById('datetime').value || Date.now()
         const keys = ['exercise', 'equipment', 'reps', 'special', 'weight', 'difficulty']
         for (const key of keys) {
-            input[key] = document.getElementById(key).value || ''
+            switch (true) {
+                case (key === 'reps' || key === 'weight'):
+                    input[key] = Number(document.getElementById(key).value) || 0
+                    break
+                case (key === 'exercise' || key === 'equipment' || key === 'special' || key === 'difficulty'):
+                    input[key] = document.getElementById(key).value || ''
+                    break
+            }
+            
         }
-        // console.log('here\'s the new record I\'m adding: ', JSON.stringify(input))
         dispatch(addNewRecord(input))
     }
     
     useEffect(() => {
-        console.log('running setVisibleREcords')
+        // console.log('running setVisibleREcords')
         setVisibleRecords(recordsToShowII(filters))
         const logo = document.getElementById("addLogoImage")
         if (Object.keys(filters).length > 0) {

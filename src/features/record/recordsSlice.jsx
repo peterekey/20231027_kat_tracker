@@ -68,8 +68,11 @@ export const recordsSlice = createSlice({
             state.records = []
         })
         .addCase(addNewRecord.fulfilled, (state, action) => {
+            console.log(`action.payload is ${action.payload}`)
             state.isLoadingRecords = false
             state.records = action.payload
+            // state.records.push(action.payload)
+            console.log('after addNewRecord.fulfilled, state.records is ', state.records)
         })
         .addCase(addNewRecord.rejected, (_, action) => {
             console.log('An error occurred: ', action.payload)
