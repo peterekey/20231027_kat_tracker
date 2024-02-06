@@ -1,5 +1,5 @@
 import './Table.css'
-import Records from '../features/record/Records'
+import Record from '../features/record/Record'
 import { useDispatch, useSelector } from 'react-redux'
 import {
     loadAllRecords,
@@ -150,26 +150,48 @@ export default function Table() {
             id: "datetime", 
         },
     ]
+
+    const handleServerReponses = () => {
+        if (visibleRecords.length === 0 && !isLoadingRecords && !hasErrorRecords) {
+            return <td><td>no data...</td></td>
+        }
+
+        if (isLoadingRecords) {
+            return <tr><td>loading data...</td></tr>
+        }
+    
+        if (hasErrorRecords) {
+            return <tr><td>an error occurred</td></tr>
+        }
+
+        return (
+            <>
+                {visibleRecords.map(record => (
+                    <Record 
+                        key={record.datetime}
+                        record={record}
+                        inputs={inputs}
+                        handleTextChange={handleTextChange}
+                    />
+                ))}
+            </>
+        )
+    }
     
     return (
         <table>
             <thead>
                 <tr>
-                    <th><label htmlFor="exercise">Exercise</label></th>
-                    <th><label htmlFor="equipment">Equipment</label></th>
-                    <th><label htmlFor="reps">Reps</label></th>
-                    <th><label htmlFor="special">Tempo or special</label></th>
-                    <th><label htmlFor="weight">Weight</label></th>
-                    <th><label htmlFor="difficulty">Difficulty</label></th>
-                    <th><label htmlFor="datetime">Date & time</label></th>
-                    <th></th>
+                    {inputs.map(input => (
+                        <th key={input.id}><label htmlFor={input.id}>{input.id}</label></th>
+                    ))}
+                    <th key="editButton"></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     {inputs.map((input) => {
-                            // eslint-disable-next-line no-unused-vars
-                            const {options, title: _, ...rest} = input
+                            const {options, ...rest} = input
                             return (
                                 <td key={input.id} >
                                     <input {...rest} onChange={handleTextChange}/>
@@ -195,11 +217,7 @@ export default function Table() {
                         />
                     </td>
                 </tr>
-            <Records 
-                records={visibleRecords}
-                isLoadingRecords={isLoadingRecords}
-                hasErrorRecords={hasErrorRecords}
-            />
+                {handleServerReponses()}
             </tbody>
         </table>
     )
