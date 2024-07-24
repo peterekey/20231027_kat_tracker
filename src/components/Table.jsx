@@ -1,19 +1,23 @@
-import './Table.css'
-import Record from '../features/record/Record'
+import './Table.css';
+import Record from '../features/record/Record';
 import { useDispatch, useSelector } from 'react-redux'
 import {
     loadAllRecords,
     selectAllRecords,
     isLoading,
     hasError,
-    addNewRecord
-} from '../features/record/recordsSlice'
-import { useEffect, useState } from 'react'
-import addLogo from '../assets/add.png'
+    addNewRecord,
+    editRecord
+} from '../features/record/recordsSlice';
+import { useEffect, useState } from 'react';
+import inputs from '../config/inputsConfig';
+import addLogo from '../assets/add.png';
+import deleteLogo from '../assets/delete.png';
 
 export default function Table() {
-    const [visibleRecords, setVisibleRecords] = useState([])
-    const [filters, setFilters] = useState({})
+    const [visibleRecords, setVisibleRecords] = useState([]);
+    const [filters, setFilters] = useState({});
+    const [filterBy, setFilterBy] = useState({id: 'datetime', descending: true});
     
     const dispatch = useDispatch()
     
@@ -25,14 +29,11 @@ export default function Table() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    // useEffect(() => {
-    //     setVisibleRecords(allRecords.records)
-    //     // setVisibleRecords(recordsToShowII(filters))
-    // }, [allRecords])
-
     const isLoadingRecords = useSelector(isLoading)
     const hasErrorRecords = useSelector(hasError)
 
+
+    // Filter records based on column filters
     const recordsToShowII = (columnFilters) => {
         const filtersArr = Object.entries(columnFilters)
         // console.log('allRecords.records is ', allRecords.records)
@@ -56,7 +57,36 @@ export default function Table() {
             }
         })
         // console.log('filteredItems is ', filteredItems)
-        return filteredItems
+
+        const compareFunction = (firstItem, secondItem) => {
+            let a, b;
+            let fieldName = filterBy.id;
+            switch(fieldName) {
+                case 'datetime':
+                case 'reps':
+                case 'weight':
+                    a = Number(firstItem[fieldName]);
+                    b = Number(secondItem[fieldName]);
+                    return filterBy.descending ? b - a : a - b;
+                case 'exercise':
+                case 'equipment':
+                case 'special':
+                case 'difficulty':
+                    a = String(firstItem[fieldName]).toLowerCase();
+                    b = String(secondItem[fieldName]).toLowerCase();
+                    if (a < b) { return filterBy.descending ? 1 : -1; }
+                    if (a > b) { return filterBy.descending ? -1 : 1; }
+                    return 0;
+                default:
+                    console.log('oh nooo something happened :(');
+                    break;
+            }
+            
+            
+        }
+
+        const filtered = filteredItems.sort(compareFunction);
+        return filtered
     }
 
     const handleTextChange = (event) => {
@@ -83,77 +113,50 @@ export default function Table() {
     }
 
     const handleAddRecord = () => {
-        const input = {}
-        input.datetime =  document.getElementById('datetime').value || Date.now()
-        const keys = ['exercise', 'equipment', 'reps', 'special', 'weight', 'difficulty']
+        const lastRecord = allRecords.records[allRecords.records.length - 1];
+        const newExerciseId = lastRecord.exerciseId + 1;
+        const input = { "exerciseId": newExerciseId };
+        input.datetime =  document.getElementById('datetime').value || Date.now();
+        const keys = ['exercise', 'equipment', 'reps', 'special', 'weight', 'difficulty'];
         for (const key of keys) {
             switch (true) {
                 case (key === 'reps' || key === 'weight'):
-                    input[key] = Number(document.getElementById(key).value) || 0
+                    input[key] = Number(document.getElementById(key).value) || 0;
                     break
                 case (key === 'exercise' || key === 'equipment' || key === 'special' || key === 'difficulty'):
-                    input[key] = document.getElementById(key).value || ''
+                    input[key] = document.getElementById(key).value || '';
                     break
             }
             
         }
         dispatch(addNewRecord(input))
     }
+
+    const handleClearInputs = () => {
+        setFilters({});
+        const inputs = document.querySelectorAll("input");
+        inputs.forEach(input => input.value = '');
+    }
+
+    const handleEditRecord = (editedRecord) => {
+        // console.log(editedRecord);
+        dispatch(editRecord(editedRecord));
+    }
     
     useEffect(() => {
-        // console.log('running setVisibleREcords')
         setVisibleRecords(recordsToShowII(filters))
-        const logo = document.getElementById("addLogoImage")
+        const logos = [...document.getElementsByClassName("icon")];
         if (Object.keys(filters).length > 0) {
-            logo.style.visibility = 'visible'
+            logos.forEach(logo => logo.style.visibility = 'visible');
         } else {
-            logo.style.visibility = 'hidden'
+            logos.forEach(logo => logo.style.visibility = 'hidden');
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filters, allRecords])
-
-    const inputs = [
-        {
-            type: "text",
-            id: "exercise",
-            name: "exercise", 
-        },
-        {
-            type: "text",
-            id: "equipment", 
-            name: "equipment"
-        },
-        {
-            type: "number",
-            id: "reps", 
-            name: "reps"
-        },
-        {
-            type: "text",
-            id: "special", 
-            name: "special"
-        },
-        {
-            type: "number",
-            id: "weight", 
-            name: "weight"
-        },
-        {
-            type: "text",
-            id: "difficulty",
-            name: "difficulty",
-            list: "difficultynames",
-            options: ["easy", "manageable", "hard", "couldn't complete"] 
-        },
-        {
-            type: "datetime-local",
-            id: "datetime", 
-        },
-    ]
+    }, [filters, allRecords, filterBy])
 
     const handleServerReponses = () => {
         if (visibleRecords.length === 0 && !isLoadingRecords && !hasErrorRecords) {
-            return <td><td>no data...</td></td>
+            return <tr><td>no data...</td></tr>
         }
 
         if (isLoadingRecords) {
@@ -168,14 +171,29 @@ export default function Table() {
             <>
                 {visibleRecords.map(record => (
                     <Record 
-                        key={record.datetime}
+                        key={record.exerciseId}
                         record={record}
                         inputs={inputs}
-                        handleTextChange={handleTextChange}
+                        handleEditRecord={handleEditRecord}
                     />
                 ))}
             </>
         )
+    }
+
+    const changeSortOrder = (event, fieldname) => {
+        const columnHeader = event.target.tagName.toLowerCase() === ('i' || 'label' || 'span') ? event.target.parentElement : event.target;
+
+        console.log(columnHeader)
+        console.log(fieldname);
+        
+        setFilterBy((prev) => (
+            {
+                ...prev,
+                id: fieldname,
+                descending: !prev.descending
+            }
+        ));
     }
     
     return (
@@ -183,9 +201,15 @@ export default function Table() {
             <thead>
                 <tr>
                     {inputs.map(input => (
-                        <th key={input.id}><label htmlFor={input.id}>{input.id}</label></th>
+                        <th key={input.id} onClick={(event) => changeSortOrder(event, input.id)}>
+                            <label htmlFor={input.id}>{input.id}</label>
+                            <span>
+                                {input.id === filterBy.id ? <i className={filterBy.descending == true ? 'arrow down' : 'arrow up'}></i> : (<span></span>)}
+                            </span>
+                        </th>
                     ))}
-                    <th key="editButton"></th>
+                    <th key="addButton"></th>
+                    <th key="deleteButton"></th>
                 </tr>
             </thead>
             <tbody>
@@ -194,7 +218,7 @@ export default function Table() {
                             const {options, ...rest} = input
                             return (
                                 <td key={input.id} >
-                                    <input {...rest} onChange={handleTextChange}/>
+                                    <input name="input" {...rest} onChange={handleTextChange}/>
                                     { !("list" in input) ? null : (
                                             <datalist id={input.list}>
                                                 {options.map((optionValue) => {
@@ -207,13 +231,24 @@ export default function Table() {
                             )
                         }
                     )}
-                    <td id="addLogo">
+                    <td id="addLogo" className="header-icon">
                         <img 
                             src={addLogo} 
+                            className="icon"
                             id="addLogoImage" 
                             alt="Add as new record"
                             aria-label="Add as new record"
                             onClick={handleAddRecord}
+                        />
+                    </td>
+                    <td id="deleteLogo" className="header-icon">
+                        <img
+                            src={deleteLogo}
+                            className="icon"
+                            id="deleteLogoImage"
+                            alt="Clear inputs"
+                            aria-label="Delete all inputs"
+                            onClick={handleClearInputs}
                         />
                     </td>
                 </tr>

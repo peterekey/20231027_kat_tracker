@@ -15,6 +15,7 @@ export const handlers = [
     mockDelay(500);
     return HttpResponse.json(
         recordsData.map((record) => ({
+          exerciseId: record.exerciseId,
           datetime: record.datetime,
           exercise: record.exercise,
           equipment: record.equipment,
@@ -32,6 +33,7 @@ export const handlers = [
     recordsData.push(newRecord)
     const response = HttpResponse.json(
       recordsData.map((record) => ({
+        exerciseId: record.exerciseId,
         datetime: record.datetime,
         exercise: record.exercise,
         equipment: record.equipment,
@@ -40,7 +42,20 @@ export const handlers = [
         weight: record.weight,
         difficulty: record.difficulty
       }))
-    )
+    );
     return response
+  }),
+  http.put(import.meta.env.VITE_API_URL + '/api/records/:id', async({request, params}) => {
+    const { id } = params;
+    console.log(`The id is ${id}`);
+    const editedRecord = await request.json();
+    console.log(`The editedRecord is ${JSON.stringify(editedRecord)}`);
+    const recordToUpdate = recordsData.find(record => record.exerciseId === Number(id));
+    if (recordToUpdate) {
+      Object.assign(recordToUpdate, editedRecord);
+      console.log('success!');
+      console.log(recordToUpdate);
+    }
+    return HttpResponse.json(recordToUpdate);
   })
 ];

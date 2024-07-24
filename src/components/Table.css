@@ -2,18 +2,48 @@ table, tr, td {
     border: 1px solid coral;
 }
 
-td#addLogo {
+td.header-icon {
     vertical-align: middle;
     visibility: hidden;
 
 }
 
-img#addLogoImage {
+img.icon {
     max-height: 20px;
     max-width: 20px;
     display: block;
 }
 
-img#addLogoImage:hover {
+img.icon:hover {
     cursor: pointer;
 }
+
+.arrow {
+    border: solid pink;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+
+  }
+  
+  .right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+  }
+  
+  .left {
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+  }
+  
+  .up {
+    margin: 0 10px;
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+  }
+  
+  .down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    margin: 3px 10px;
+  }
