@@ -45,6 +45,35 @@ export const addNewRecord = createAsyncThunk(
     }
 )
 
+export const editRecord = createAsyncThunk(
+    'records/editRecord',
+    async (editedRecord, {rejectWithValue}) => {
+        try {
+            console.log(`The editedRecord is:`)
+            console.log(editedRecord);
+            const response = await fetch(import.meta.env.VITE_API_URL + `/api/records/${editedRecord.exerciseId}`, {
+                method: 'PUT',
+                body: JSON.stringify(editedRecord),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
+            if (response.ok) {
+                console.log('great!')
+                const json = await response.json()
+                return json
+            } else {
+                console.log('An error occurred')
+                return
+            }
+        } catch (error) {
+            console.log('error: ', error)
+            return rejectWithValue(error.response.data.message)
+        }
+    }
+)
+
 export const recordsSlice = createSlice({
     name: "records",
     initialState: {
@@ -76,6 +105,21 @@ export const recordsSlice = createSlice({
         })
         .addCase(addNewRecord.rejected, (_, action) => {
             console.log('An error occurred: ', action.payload)
+        })
+        .addCase(editRecord.fulfilled, (state, action) => {
+            const index = state.records.findIndex(record => record.exerciseId === action.payload.exerciseId);
+            console.log('state.records is:')
+            console.log(state.records)
+            console.log('action.payload is:')
+            console.log(action.payload)
+            if (index !== -1) {
+                console.log(`action.payload is ${action.payload}`);
+                state.records = [
+                    ...state.records.slice(0, index),
+                    action.payload,
+                    ...state.records.slice(index + 1)
+                ];
+            }
         })
     }})
 
