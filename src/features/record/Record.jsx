@@ -1,9 +1,82 @@
 import PropTypes from 'prop-types'
 import { useEffect, useState, useRef, createRef } from 'react';
+import inputs from '../../../src/config/inputsConfig';
 
-const Record = ({record, inputs, handleEditRecord}) => {
+const unixToDatetimeLocal = (unixTimestamp) => {
+    const date = new Date(Number(unixTimestamp));
+    return date.toLocaleString("en-AU", {
+    });
+}
+
+const datetimeLocalToUnix = (datetimeString) => {
+    return new Date(datetimeString).getTime();
+}
+
+const Record = ({record, handleEditRecord}) => {
 
     const [isEditing, setIsEditing] = useState(false)
+    const [editedRecord, setEditedRecord] = useState({
+        ...record,
+        datetime: unixToDatetimeLocal(record.datetime)
+    });
+
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setEditedRecord(prev => ({
+            ...prev,
+            [name]: 
+                name === 'datetime' ? Date.parse(value) :
+                ['reps', 'weight'].includes(name) ? Number(value) : 
+                value
+        }));
+    }
+
+    const handleSave = () => {
+        const updatedRecord = {
+            ...editedRecord,
+            datetime: datetimeLocalToUnix(editedRecord.datetime)
+        }
+        handleEditRecord(updatedRecord);
+        setIsEditing(false);
+    }
+
+    if (isEditing) {
+        return (
+            <tr>
+                {inputs.map(input => (
+                    <td key={input.id}>
+                        <input
+                            type={input.type}
+                            name={input.id}
+                            value={editedRecord[input.id]}
+                            onChange={handleInputChange}
+                        />
+                    </td>
+                ))}
+                <td>
+                    <button onClick={handleSave}>Save</button>
+                    <button onClick={() => setIsEditing(false)}>Cancel</button>
+                </td>
+            </tr>
+        )
+    }
+
+    return (
+        <tr>
+            {inputs.map(input => (
+                <td key={input.id}>
+                    {input.id === 'datetime' 
+                        ? unixToDatetimeLocal(record[input.id]).replace('T', ' ')
+                        : record[input.id]
+                    }
+                </td>
+            ))}
+            <td>
+                <button onClick={() => setIsEditing(true)}>Edit</button>
+            </td>
+        </tr>
+    )
+
     const cellRefs = useRef(inputs.map(() => createRef()))
     const [newRecord, setNewRecord] = useState(record)
     const difficultyObject = inputs.find(input => input.id == "difficulty")
@@ -62,25 +135,7 @@ const Record = ({record, inputs, handleEditRecord}) => {
         }
     }
 
-    const handleInputChange = (event) => {
-        const keyToChange = event.target.name;
-        let valueToChange;
-        if (keyToChange === 'datetime') {
-            valueToChange = Date.parse(event.target.value)
-        } else {
-            valueToChange = event.target.value;
-        }
-        console.log('keyToChange is:')
-        console.log(keyToChange)
-        console.log('valueToChange is:')
-        console.log(valueToChange)
-        setNewRecord((prev) => {
-            return {
-                ...prev,
-                [keyToChange]: valueToChange
-            }
-        })
-    }
+
 
     useEffect(() => {
         const handleOutsideClick = (event) => {
